@@ -20,3 +20,14 @@ SNo	ObservationDate	Province/State	Country/Region	Last Update	Confirmed	Deaths	R
 ### Top 10 Countries with corona infected cases 
 
 ![top10](https://github.com/yatinkode/Covid19-analysis-and-forecasting/blob/master/images/top10.jpg)
+
+### World based distribution of Corona confirmed cases
+![top10](https://github.com/yatinkode/Covid19-analysis-and-forecasting/blob/master/images/worldmap.JPG)
+
+### Forecasting Corona cases for next 10 days for India
+![top10](https://github.com/yatinkode/Covid19-analysis-and-forecasting/blob/master/images/forecast.png)
+
+| __27-Mar-20_ | __28-Mar-20_ | __29-Mar-20_ | __30-Mar-20_ | __31-Mar-20_ | __1-Apr-20_ | __2-Apr-20_ |__3-Apr-20_ |__4-Apr-20_ |__5-Apr-20__ |
+|--------------|--------------|--------------|--------------|--------------|--------------|------------|------------|------------|---------------|
+| 864.804      | 1071.762     |  1249.901    | 1470.407     | 1709.485     | 1987.102     | 2279.993   | 2677.183   | 3098.262   | 3690.317
+
