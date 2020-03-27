@@ -24,7 +24,7 @@ SNo	ObservationDate	Province/State	Country/Region	Last Update	Confirmed	Deaths	R
 ### World based distribution of Corona confirmed cases
 ![top10](https://github.com/yatinkode/Covid19-analysis-and-forecasting/blob/master/images/worldmap.JPG)
 
-### Forecasting Corona cases for next 10 days for India
+### Forecasting Corona cases for next 10 days in India
 ![top10](https://github.com/yatinkode/Covid19-analysis-and-forecasting/blob/master/images/forecast.png)
 
 | 27-03-20 | 28-03-20 | 29-03-20 | 30-03-20 | 31-03-20 | 1-04-20 | 2-04-20 | 3-04-20 | 4-04-20 | 5-04-20 |
