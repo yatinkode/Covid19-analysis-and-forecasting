@@ -21,6 +21,12 @@ from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
 from bokeh.palettes import brewer
 import geopandas as gpd
 
+#libraries for facebook prophet
+from fbprophet import Prophet
+from fbprophet.diagnostics import cross_validation
+from fbprophet.diagnostics import performance_metrics
+from fbprophet.plot import plot_cross_validation_metric
+
 ############### Load dataset ##################################
 data =  pd.read_csv("C:\\Users\\kode surendra aba\\Desktop\\Data science\\novel-corona-virus-2019-dataset\\covid_19_data.csv")
 
@@ -123,7 +129,7 @@ y = ind['Confirmed'].resample('D',level=0).mean()
 decomposition = sm.tsa.seasonal_decompose(y, model='additive')
 fig = decomposition.plot()
 
-p = d = q = range(0, 3)
+p = d = q = range(0, 2)
 pdq = list(itertools.product(p, d, q))
 seasonal_pdq = [(x[0], x[1], x[2], 12) for x in list(itertools.product(p, d, q))]
 print('Examples of parameter combinations for Seasonal ARIMA...')
@@ -203,3 +209,49 @@ print(pred_uc.predicted_mean)
 #2020-04-03    2677.183613
 #2020-04-04    3098.262067
 #2020-04-05    3690.317032
+
+################################### Facebook prophet timeseries ##########################
+
+daily_train = ind.resample('D').sum()
+
+#facebook prophet needs the names of the 2 columns to be ds and y respectively
+daily_train['ds'] = daily_train.index
+daily_train['y'] = daily_train.Confirmed
+daily_train.drop(['Confirmed'],axis = 1, inplace = True)
+
+m = Prophet(growth="logistic",seasonality_mode='multiplicative') #logistic - since sudden groeth at a point
+
+daily_train['cap'] = 1500 #maximum capacity for time series based on business problem
+
+m.fit(daily_train)
+future = m.make_future_dataframe(periods=10)
+future['cap'] = 1500
+forecast = m.predict(future)
+
+m.plot_components(forecast)
+
+m.plot(forecast)
+
+a = m.plot(forecast)
+
+df_cv = cross_validation(m, initial='10 days', period='2 days', horizon = '5 days')
+df_cv.head()
+
+df_p = performance_metrics(df_cv)
+df_p.head()
+
+
+fig = plot_cross_validation_metric(df_cv, metric='mape')
+
+forecast[['ds','yhat']].tail(10)
+
+#2020-03-27   718.719249
+#2020-03-28   890.265552
+#2020-03-29   973.727510
+#2020-03-30  1107.658426
+#2020-03-31  1093.352717
+#2020-04-01  1213.865651
+#2020-04-02  1238.818136
+#2020-04-03  1150.066958
+#2020-04-04  1327.578203
+#2020-04-05  1362.981341
