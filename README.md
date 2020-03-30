@@ -32,7 +32,7 @@ SNo	ObservationDate	Province/State	Country/Region	Last Update	Confirmed	Deaths	R
 | 864.80   | 1071.76  | 1249.90  | 1470.40  | 1709.48  | 1987.10 | 2279.99 | 2677.18 | 3098.26 | 3690.31 |
 
 ### Forecasting Corona cases for next 10 days in India (Facebook prophet timeseries)
-![top10](https://github.com/yatinkode/Covid19-analysis-and-forecasting/blob/master/images/forecast.png)
+![top10](https://github.com/yatinkode/Covid19-analysis-and-forecasting/blob/master/images/forecastfb.png)
 
 | 27-03-20 | 28-03-20 | 29-03-20 | 30-03-20 | 31-03-20 | 1-04-20 | 2-04-20 | 3-04-20 | 4-04-20 | 5-04-20 |
 |----------|----------|----------|----------|----------|---------|---------|---------|---------|---------|
