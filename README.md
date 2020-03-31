@@ -19,7 +19,7 @@ SNo	ObservationDate	Province/State	Country/Region	Last Update	Confirmed	Deaths	R
 
 ### Top 10 Countries with corona infected cases 
 
-![top10](https://github.com/yatinkode/Covid19-analysis-and-forecasting/blob/master/images/top10_1.jpg)
+![top10](https://github.com/yatinkode/Covid19-analysis-and-forecasting/blob/master/images/top10.gif)
 
 ### Interactive World based distribution of Corona confirmed cases
 ![top10](https://github.com/yatinkode/Covid19-analysis-and-forecasting/blob/master/images/geomap.gif)
