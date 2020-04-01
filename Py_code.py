@@ -12,20 +12,19 @@ import statsmodels.api as sm
 import itertools
 
 #libraries for plotting
-import json
 from matplotlib import pyplot as plt
-import seaborn as sns
-from bokeh.io import show
-from bokeh.plotting import figure
-from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
-from bokeh.palettes import brewer
-import geopandas as gpd
+from plotly.offline import plot
+import plotly.express as px
 
 #libraries for facebook prophet
 from fbprophet import Prophet
 from fbprophet.diagnostics import cross_validation
 from fbprophet.diagnostics import performance_metrics
 from fbprophet.plot import plot_cross_validation_metric
+
+import seaborn as sns
+# Use seaborn style defaults and set the default figure size
+sns.set(rc={'figure.figsize':(15, 4)})
 
 ############### Load dataset ##################################
 data =  pd.read_csv("C:\\Users\\kode surendra aba\\Desktop\\Data science\\novel-corona-virus-2019-dataset\\covid_19_data.csv")
@@ -64,53 +63,33 @@ Final_data = (grouped['Confirmed','Deaths','Recovered'].agg(np.sum)).sort_values
 
 df = pd.melt(Final_data.head(10), id_vars="Country", var_name="Type", value_name="Count")
 
-plt.figure(figsize=(5000, 3000))
-splot = sns.catplot(x="Count", y="Country", hue="Type", kind="bar", data=df,height=10)
-
 ############### Plotting Top 10 Countries ##############################
+
+fig = px.bar(df, x="Country", y="Count", barmode="group",color="Type", facet_col="Type",
+       category_orders={"Type": ['Confirmed','Deaths','Recovered']})
+
+fig.update_layout(barmode='group', xaxis={'categoryorder':'Count descending'})
+
+plot(fig)
+
+############## Interactive geo map using plotly ##############################
+
+data['Date'] =  pd.to_datetime(data['Date'], format='%m/%d/%Y')
+
+grouped = data.groupby(['Date','Country'],as_index=False)
+Final_data = (grouped['Confirmed'].agg(np.sum))
 
 cc =  pd.read_csv("C:\\Users\\kode surendra aba\\Desktop\\Data science\\novel-corona-virus-2019-dataset\\countrycode.csv")
 
-Final_data = cc.merge(Final_data, on='Country', how='left')
+Final_data = cc.merge(Final_data, on='Country', how='left').sort_values(by=["Date"],ascending=True)
 
-shapefile = 'C:\\Users\\kode surendra aba\\Desktop\\Data science\\novel-corona-virus-2019-dataset\\ne_110m_admin_0_countries\\ne_110m_admin_0_countries.shp'#Read shapefile using Geopandas
-gdf = gpd.read_file(shapefile)[['ADMIN', 'ADM0_A3', 'geometry']]#Rename columns.
-gdf.columns = ['Country', 'Code', 'geometry']
-gdf.head()
+Final_data = Final_data.dropna()
 
-print(gdf[gdf['Country'] == 'Antarctica'])#Drop row corresponding to 'Antarctica'
-gdf = gdf.drop(gdf.index[159])
+Final_data['Date'] = Final_data['Date'].dt.strftime('%d-%b-%y')
 
-Final_data = gdf.merge(Final_data, on='Code', how='left')
 
-Final_data.rename(columns = {"Country_y": "Country"}, inplace = True) 
-
-Final_data.fillna('No data', inplace = True)
-
-Final_data = Final_data.drop(columns=['Country','Deaths','Recovered'])
-
-merged_json = json.loads(Final_data.to_json())#Convert to String like object.
-json_data = json.dumps(merged_json)
-
-#################### Plotting cases on World map ##########################
-
-#Input GeoJSON source that contains features for plotting.
-geosource = GeoJSONDataSource(geojson = json_data)    #Define a sequential multi-hue color palette.
-palette = brewer['OrRd'][8]   #Reverse color order so that dark blue is highest cases.
-palette = palette[::-1]      #Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
-color_mapper = LinearColorMapper(palette = palette, low = 0, high = 50000, nan_color = '#d9d9d9')#Define custom tick labels for color bar.
-tick_labels = {'0': '0', '100': '100', '500':'500', '1000':'1000', '5000':'5000','10000':'10000', '50000': '>50000'}#Create color bar. 
-color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8,width = 500, height = 20,
-border_line_color=None,location = (0,0), orientation = 'horizontal', major_label_overrides = tick_labels)#Create figure object.
-p = figure(title = 'Corona confirmed cases as of {}'.format(last_day[0].date().strftime('%d-%b-%Y')), plot_height = 550 , plot_width = 900, toolbar_location = None)
-p.xgrid.grid_line_color = None
-p.ygrid.grid_line_color = None
-
-#Add patch renderer to figure. 
-p.patches('xs','ys', source = geosource,fill_color = {'field' :'Confirmed', 'transform' : color_mapper},
-          line_color = 'black', line_width = 0.25, fill_alpha = 1)#Specify figure layout.
-p.add_layout(color_bar, 'below')#Display figure inline in Jupyter Notebook.
-show(p)
+fig = px.choropleth(Final_data, locations="Code",title="Corona confirmed cases from 22-Jan-20 to 26-Mar-20", color="Confirmed", hover_name="Country", animation_frame="Date", range_color=[1000,100000],color_continuous_scale=px.colors.sequential.Reds)
+plot(fig)
 
 ######################### Forecasting future cases for India of Coronavirus #################
 ind = data[data['Country']=='India'] #Choosing India data now
@@ -121,13 +100,18 @@ ind.drop(['Country', 'Deaths','Recovered'], axis=1, inplace=True)
 ind = ind.set_index('Date')
 ind.index
 
-#Plotting the time series
-ind.plot(figsize=(15, 6))
+plt.plot(ind.index, ind.values)
 
 y = ind['Confirmed'].resample('D',level=0).mean()
 
 decomposition = sm.tsa.seasonal_decompose(y, model='additive')
-fig = decomposition.plot()
+
+plt.subplot(3, 1, 1)
+plt.plot(decomposition.trend.index, decomposition.trend.values)
+plt.subplot(3, 1, 2)
+plt.plot(decomposition.seasonal.index, decomposition.seasonal.values)
+plt.subplot(3, 1, 3)
+plt.plot(decomposition.resid.index, decomposition.resid.values)
 
 p = d = q = range(0, 2)
 pdq = list(itertools.product(p, d, q))
